@@ -43,9 +43,9 @@ public class ShiftMatrix {
         int lastRowSize = map.get(sequence.length-1).size();
 
         if(lastRowSize < rowSize){
-            // wypełnienie gwiazdkami pustych miejsc w ostatnim wierszu
+            // wypełnienie spacjami pustych miejsc w ostatnim wierszu
             for(int j=lastRowSize; j<rowSize; j++){
-                map.get(counter).add('*');
+                map.get(counter).add(' ');
             }
         }
 
@@ -99,7 +99,7 @@ public class ShiftMatrix {
         map.keySet().forEach(keyMap -> {
             for (int sequenceKey : revertedSequence) {
                 if (map.get(keyMap).size() >= sequenceKey)
-                    if(!map.get(keyMap).get(sequenceKey-1).equals('*')){    // pominięcie znaków gwiazdki, które służyły przy szyfrowaniu jako wypełnienie niepełnego wiersza
+                    if(!map.get(keyMap).get(sequenceKey-1).equals(' ')){    // pominięcie znaków spacji, które służyły przy szyfrowaniu jako wypełnienie niepełnego wiersza
                         cipheredText.append(map.get(keyMap).get(sequenceKey - 1));
                     }
             }
