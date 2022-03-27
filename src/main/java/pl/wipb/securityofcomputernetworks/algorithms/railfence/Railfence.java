@@ -34,7 +34,9 @@ class Railfence {
         LinkedList<Character> characters = new LinkedList<>();
         for (int i = 0; i < key; i++)
             for (int j = 0; j < text.length(); j++)
-                characters.addLast(rail[i][j]);
+                if (rail[i][j] != '\u0000') {
+                    characters.addLast(rail[i][j]);
+                }
 
         return convertListToString(characters);
     }
