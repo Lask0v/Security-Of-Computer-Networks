@@ -105,7 +105,7 @@ public class SecondShiftMatrix {
         // Tworzymy listę obiektów klasy Key
         List<Key> keys = new ArrayList<>();
 
-        // Zapisywanie samych liter w obiektach klasy Key i dodawnie ich do listy
+        // Zapisywanie samych liter w obiektach klasy Key i dodawanie ich do listy
         for (int i = 0; i < key.length(); i++) {
             Key k = new Key(key.charAt(i));
             keys.add(k);
