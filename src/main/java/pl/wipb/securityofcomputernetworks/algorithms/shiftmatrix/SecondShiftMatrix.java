@@ -88,4 +88,69 @@ public class SecondShiftMatrix {
 
         return stringBuilder.toString();
     }
+
+    @GetMapping("/decrypt")
+    public String decrypt(@RequestParam String message, @RequestParam String key){
+        HashMap<Key, LinkedList<Character>> map = new HashMap<>();
+
+        // Stworzenie tablicy pojedyńczych słów z wiadomości
+        String[] words = message.split(" ");
+
+        // Zliczanie długości wiadomości bez spacji
+        int actualMessageLength = message.replaceAll(" ","").length();
+
+        char[] keyChars = key.toCharArray();
+        Arrays.sort(keyChars);
+
+        // Tworzymy listę obiektów klasy Key
+        List<Key> keys = new ArrayList<>();
+
+        // Zapisywanie samych liter w obiektach klasy Key i dodawnie ich do listy
+        for (int i = 0; i < key.length(); i++) {
+            Key k = new Key(key.charAt(i));
+            keys.add(k);
+        }
+
+        // Ustalanie kolejności alfabetycznej dla wszystkich obiektów Key
+        for (int i = 0; i < keyChars.length; i++) {
+            int finalI = i;
+            Key foundKey = keys.stream()
+                    .filter(k -> k.letter.equals(keyChars[finalI]))
+                    .filter(k -> k.number == null)
+                    .findFirst()
+                    .get();
+            foundKey.setNumber(finalI+1);
+        }
+
+        // Tworzenie LinkedList dla każdego obiektu klasy Key (inicjalizacja macierzy)
+        for (Key k:keys) {
+            map.putIfAbsent(k, new LinkedList<>());
+        }
+
+        // Stworzenie kopii tabeli "keys" i posortowanie jej kluczy według kolejności alfabetycznej
+        List<Key> sortedKeys = new ArrayList<>(keys);
+        sortedKeys.sort(Comparator.comparing(Key::getNumber));
+
+        // Uzupełnianie macierzy
+        for (int i = 0; i < words.length; i++) {
+            for (int j = 0; j < words[i].length(); j++) {
+                map.get(sortedKeys.get(i)).add(words[i].charAt(j));
+            }
+        }
+
+        // Zwracanie odszyfrowanego hasła
+        StringBuilder stringBuilder = new StringBuilder();
+        int inRowCounter = 0;
+        int rowCounter=0;
+
+        for (int i = 0; i < actualMessageLength; i++) {
+            stringBuilder.append(map.get(keys.get(inRowCounter)).get(rowCounter));
+            if(++inRowCounter >= keys.size()){
+                inRowCounter = 0;
+                rowCounter++;
+            }
+        }
+
+        return stringBuilder.toString();
+    }
 }
