@@ -37,7 +37,7 @@ public class SecondShiftMatrix {
         char[] keyChars = key.toCharArray();
         Arrays.sort(keyChars);
 
-        // Tworzymy listę obiektów klasy Key
+        // Tworzenie listy obiektów klasy Key
         List<Key> keys = new ArrayList<>();
 
         // Zapisywanie samych liter w obiektach klasy Key i dodawnie ich do listy
