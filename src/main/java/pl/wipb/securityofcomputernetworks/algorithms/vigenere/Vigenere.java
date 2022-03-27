@@ -39,6 +39,6 @@ public class Vigenere {
     }
 
     private char decrypt(char input, char key) {
-        return (char) ((26 - (key - 'A')  + (input - 'A')) % NUM_OF_LETTERS_IN_ALPHABET + 'A');
+        return (char) ((NUM_OF_LETTERS_IN_ALPHABET - (key - 'A')  + (input - 'A')) % NUM_OF_LETTERS_IN_ALPHABET + 'A');
     }
 }
