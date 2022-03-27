@@ -12,7 +12,7 @@ public class Caesar {
 
     @GetMapping("/encrypt")
     public String encrypt(@RequestParam String message, @RequestParam int key) {
-        char[] input = message.toCharArray();
+        char[] input = message.toUpperCase().toCharArray();
         char[] encrypted = new char [input.length];
         for (int i = 0; i < input.length; i++) {
             encrypted[i] = encrypt(input[i], key);
@@ -26,7 +26,7 @@ public class Caesar {
 
     @GetMapping("/decrypt")
     public String decrypt(@RequestParam String message, @RequestParam int key) {
-        char[] input = message.toCharArray();
+        char[] input = message.toUpperCase().toCharArray();
         char[] decrypted = new char [input.length];
         for (int i = 0; i < input.length; i++) {
             decrypted[i] = decrypt(input[i], key);

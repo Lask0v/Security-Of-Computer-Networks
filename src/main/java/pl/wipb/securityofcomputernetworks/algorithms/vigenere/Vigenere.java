@@ -12,8 +12,8 @@ public class Vigenere {
 
     @GetMapping("/encrypt")
     public String encrypt(@RequestParam String message, @RequestParam String key) {
-        char[] input = message.toCharArray();
-        char[] k = key.toCharArray();
+        char[] input = message.toUpperCase().toCharArray();
+        char[] k = key.toUpperCase().toCharArray();
         char[] encrypted = new char[input.length];
 
         for (int i = 0; i < input.length; i++) {
@@ -28,8 +28,8 @@ public class Vigenere {
 
     @GetMapping("/decrypt")
     public String decrypt(@RequestParam String message, @RequestParam String key) {
-        char[] input = message.toCharArray();
-        char[] k = key.toCharArray();
+        char[] input = message.toUpperCase().toCharArray();
+        char[] k = key.toUpperCase().toCharArray();
         char[] decrypted = new char[input.length];
 
         for (int i = 0; i < input.length; i++) {
