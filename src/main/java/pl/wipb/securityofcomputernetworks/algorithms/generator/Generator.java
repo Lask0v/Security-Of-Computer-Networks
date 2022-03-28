@@ -13,13 +13,6 @@ import java.util.List;
 @RequestMapping("/generator")
 public class Generator {
 
-    // Wyraz wielomianu, czyli np "2x^4"
-    @AllArgsConstructor
-    private class PolynomialComponent {
-        Integer coefficient;
-        Integer degree;
-    }
-
     @GetMapping()
     public String encrypt(@RequestParam String polynomial) {
         List<PolynomialComponent> polynomialComponentList = new ArrayList<>();
@@ -29,19 +22,25 @@ public class Generator {
         int counter = 0;
         for (String s : list) {
             if (counter++ == 0) {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))),null));
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))), null));
             }
             String[] xes = s.split("x");
 
-            if  (counter++ == 1) {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))),1));
-            }
-            else {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]),Integer.parseInt(xes[1])));
+            if (counter++ == 1) {
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))), 1));
+            } else if (counter > 1) {
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]), Integer.parseInt(xes[1])));
 
             }
         }
 
         return null;
+    }
+
+    // Wyraz wielomianu, czyli np "2x^4"
+    @AllArgsConstructor
+    private class PolynomialComponent {
+        Integer coefficient;
+        Integer degree;
     }
 }
