@@ -89,10 +89,11 @@ public class ShiftMatrix {
             }
         }
 
-        // odczytanie macierzy
+        // Odczytanie zawartości macierzy
         StringBuilder newMessage = new StringBuilder();
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < sortedKeys.length; j++) {
+                // Pominięcie spacji, które służyły zaznaczeniu pustych komórek
                 if(!map.get(sortedKeys[j]).get(i).equals(' ')) {
                     newMessage.append(map.get(sortedKeys[j]).get(i));
                 }

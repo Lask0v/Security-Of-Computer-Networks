@@ -67,6 +67,12 @@ public class ThirdShiftMatrix {
 
         // Uzupełnianie macierzy
         for (int i = 0; i < message.length(); i++) {
+
+            // Poinformowanie o błędzie w przypadku zbyt krótkiego klucza
+            if(rowCount+1 > keys.size()){
+                return "Klucz jest zbyt krótki!";
+            }
+
             map.get(keys.get(countInRow)).add(message.charAt(i));
             int finalRowCount = rowCount+1;
 
@@ -158,6 +164,10 @@ public class ThirdShiftMatrix {
         int rowCounter=0;
 
         for (int i = 0; i < actualMessageSize; i++) {
+            // Poinformowanie o błędzie w przypadku zbyt krótkiego klucza
+            if(rowCounter+1 > keys.size()){
+                return "Klucz jest zbyt krótki!";
+            }
             Character character = map.get(keys.get(inRowCounter)).get(rowCounter);
             // Wypisujemy wszystkie znaki oprócz gwiazdek - one slużyły tylko do oznaczenia wolnych komórek
             if(!character.equals('*')) {

@@ -37,7 +37,7 @@ class ShiftMatrixTest {
     @Test
     void test_encrypt_0() {
         String messageToEncrypt = shiftMatrix.encrypt("CRYPTOGRAPHYOSALK","3-1-4-2");
-        Assertions.assertEquals("YCPRGTROHAYPAOLSK", messageToEncrypt);
+        Assertions.assertEquals("YCPRGTROHAYPAOLS K  ", messageToEncrypt);
     }
 
     // dl.wiadomosci%dl.klucza=3
@@ -57,14 +57,14 @@ class ShiftMatrixTest {
     // dl.wiadomosci%dl.klucza=1
     @Test
     void test_decrypt_1() {
-        String messageToDecrypt = shiftMatrix.decrypt("YCPRGTROHAYP S ","3-1-4-2");
+        String messageToDecrypt = shiftMatrix.decrypt("YCPRGTROHAYP S  ","3-1-4-2");
         Assertions.assertEquals("CRYPTOGRAPHYS", messageToDecrypt);
     }
 
     // dl.wiadomosci%dl.klucza=0
     @Test
     void test_decrypt_0() {
-        String messageToDecrypt = shiftMatrix.decrypt("YCPRGTROHAYPAOLSK","3-1-4-2");
+        String messageToDecrypt = shiftMatrix.decrypt("YCPRGTROHAYPAOLS K  ","3-1-4-2");
         Assertions.assertEquals("CRYPTOGRAPHYOSALK", messageToDecrypt);
     }
 
