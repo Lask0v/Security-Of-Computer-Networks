@@ -26,9 +26,17 @@ public class Generator {
 
 //       TODO: obsłużyć przypadki 1) np. "1" bez "x^0" oraz 2) np. "x4" bez współczynnika przed x
         List<String> list = List.of(polynomial.split(" + "));
-        for (int i = 0; i < list.size(); i++) {
-            PolynomialComponent polynomialComponent = new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(i).charAt(0))), Integer.parseInt(String.valueOf(list.get(i).charAt(2))));
-            polynomialComponentList.add(polynomialComponent);
+        int counter = 0;
+        for (String s : list) {
+            if (counter++ == 0) {
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))),null));
+            }
+            String[] xes = s.split("x");
+
+            if  (counter++ == 1) {
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))),1));
+            }
+            polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]),Integer.parseInt(xes[1])));
         }
 
         return null;
