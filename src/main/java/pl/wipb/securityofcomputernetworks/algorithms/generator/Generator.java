@@ -36,7 +36,10 @@ public class Generator {
             if  (counter++ == 1) {
                 polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))),1));
             }
-            polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]),Integer.parseInt(xes[1])));
+            else {
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]),Integer.parseInt(xes[1])));
+
+            }
         }
 
         return null;
