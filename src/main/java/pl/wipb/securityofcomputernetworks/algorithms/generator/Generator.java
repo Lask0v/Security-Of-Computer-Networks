@@ -14,7 +14,6 @@ import java.util.List;
 public class Generator {
 
     @GetMapping()
-    // Wielomian przyjmujemy w postaci stringa np. "1 + 2x2 + 3x4 + x6"
     public String encrypt(@RequestParam String polynomial) {
         List<PolynomialComponent> polynomialComponentList = new ArrayList<>();
 
@@ -23,15 +22,17 @@ public class Generator {
         int counter = 0;
         for (String s : list) {
             if (counter++ == 0) {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))), null));
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(s), 0));
+                continue;
             }
             String[] xes = s.split("x");
 
             if (counter++ == 1) {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(String.valueOf(list.get(0))), 1));
+                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]), 1));
+                continue;
             } else if (counter > 1) {
                 polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]), Integer.parseInt(xes[1])));
-
+                continue;
             }
         }
 
