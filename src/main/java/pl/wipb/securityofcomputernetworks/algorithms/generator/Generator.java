@@ -1,12 +1,15 @@
 package pl.wipb.securityofcomputernetworks.algorithms.generator;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -14,18 +17,22 @@ import java.util.List;
 public class Generator {
 
     @GetMapping("/LSFR")
-    public List<Integer> gen(@RequestParam String polynomial,
+    public String gen(@RequestParam String polynomial,
                     @RequestParam String seed,
-                    @RequestParam Integer wantedResultLength){
+                    @RequestParam Integer wantedResultLength) throws Exception {
 
         List<Integer> result = new ArrayList<>();
 
         // Przekonwertowanie wielomianu ze stringa na listę obiektów typu PolynomialComponent
         List<PolynomialComponent> polynomialComponentList = extractPolynomial(polynomial);
+        int maxDegree = polynomialComponentList.stream().max(Comparator.comparing(PolynomialComponent::getDegree)).get().getDegree();
 
         // Przekonwertowanie ziarna
-        //TODO trzeba zrobic na to walidacje
-        //TODO walidacje na to, czy jego dlugosc == najwyzsza potega wielomianu
+
+        if(!isSeedValid(seed, maxDegree)){
+            return "Długość ziarna nie może być krótsza niż stopień wielomianu, które wynosi "+maxDegree;
+        }
+
         List<Integer> seedElementList = new ArrayList<>();
         for(int i=0; i<seed.length(); i++){
             seedElementList.add(Integer.parseInt(String.valueOf(seed.charAt(i))));
@@ -52,7 +59,12 @@ public class Generator {
             // Usuniecie z seeda ostatniej wartosci
             seedElementList.remove(seedElementList.size() - 1);
         }
-        return result;
+        return result.toString();
+    }
+
+    // Sprawdza, czy długość ziarna nie jest krótsza niż stopień wielomianu
+    private boolean isSeedValid(String seed, int maxDegree) {
+        return seed.length() >= maxDegree;
     }
 
     // Funkcja xorująca (jeżeli xor ma wszystkie wartości=1 lub wszystkie wartości=0, zwróć 0 jako wynik
@@ -89,6 +101,7 @@ public class Generator {
 
     // Wyraz wielomianu, czyli np "2x^4" -> w tym przypadku 2 to coefficient, a 4 to degree
     @AllArgsConstructor
+    @Getter
     private class PolynomialComponent {
         Integer coefficient;
         Integer degree;
