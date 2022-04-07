@@ -8,81 +8,51 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 @RestController
 @RequestMapping("/generator")
 public class Generator {
 
-    @GetMapping()
-    public String encrypt(@RequestParam String polynomial) {
-        List<PolynomialComponent> polynomialComponentList = new ArrayList<>();
+    @GetMapping("/LSFR")
+    public List<Integer> gen(@RequestParam String polynomial,
+                    @RequestParam String seed,
+                    @RequestParam Integer wantedResultLength){
 
-//       TODO: obsłużyć przypadki 1) np. "1" bez "x0" oraz 2) np. "x4" bez współczynnika przed x
-        List<String> list = List.of(polynomial.split(" + "));
-        int counter = 0;
-        for (String s : list) {
-            if (counter++ == 0) {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(s), 0));
-                continue;
-            }
-            String[] xes = s.split("x");
-
-            if (counter++ == 1) {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]), 1));
-                continue;
-            } else if (counter > 1) {
-                polynomialComponentList.add(new PolynomialComponent(Integer.parseInt(xes[0]), Integer.parseInt(xes[1])));
-                continue;
-            }
-        }
-
-        return null;
-    }
-
-    @GetMapping("/generator")
-    public void gen(){
-        //Wynik -pozniej to mozna przerobic zeby nie bylo na liscie ale nwm
         List<Integer> result = new ArrayList<>();
 
-        //Na sztywno podany wielomian z przykładu
-        List<PolynomialComponent> polynomialComponentList = new ArrayList<>();
-        polynomialComponentList.add(new PolynomialComponent(1,0));
-        polynomialComponentList.add(new PolynomialComponent(1,1));
-        polynomialComponentList.add(new PolynomialComponent(1,4));
+        // Przekonwertowanie wielomianu ze stringa na listę obiektów typu PolynomialComponent
+        List<PolynomialComponent> polynomialComponentList = extractPolynomial(polynomial);
 
-        //Ziarno. Podane birnarnie (na razie na sztywno z przykładu) ->
+        // Przekonwertowanie ziarna
         //TODO trzeba zrobic na to walidacje
         //TODO walidacje na to, czy jego dlugosc == najwyzsza potega wielomianu
-        List<Integer> seed = new ArrayList<>();
+        List<Integer> seedElementList = new ArrayList<>();
+        for(int i=0; i<seed.length(); i++){
+            seedElementList.add(Integer.parseInt(String.valueOf(seed.charAt(i))));
+        }
 
-        seed.add(0);
-        seed.add(1);
-        seed.add(1);
-        seed.add(0);
-
-        Scanner scanner = new Scanner(System.in);
+        // Poddaniu operacji XOR te elementy, które występują na tym miejscu w ziarnie, których potęgi występują w wielomianie
+        // Na przykład dla wielomianu 2x2+3x6 xorujemy elementy które znajdują się na 2 i 6 elemencie w aktualnym ziarnie
         List<Integer> xorList;
-
-        final int wantedResultElements = 7;
-        for(int i = 0 ; i<wantedResultElements; i++){
+        for(int i = 0 ; i<wantedResultLength; i++){
             xorList = new ArrayList<>();
+            // Przejście po wszystkich wyrazach wielomianu
             for (PolynomialComponent component : polynomialComponentList) {
                 if (component.degree != 0) {
-                    xorList.add(seed.get(component.degree - 1));
+                    // Wywołanie operacji xor dla elementu, który znajduje się na pozycji takiej, jak stopień wielomianu
+                    xorList.add(seedElementList.get(component.degree - 1));
                 }
             }
 
-            //Przesuniecie
-            //Dodanie na poczatek seeda wyniku xora
-            seed.add(0, executeXor(xorList));
-            //Dodanie do wyniku ostatniej wartości xora
-            result.add(seed.get(seed.size() - 1));
-            //Usuniecie z seeda ostatniej wartosci
-            seed.remove(seed.size() - 1);
+            // SLAJD 10 Z TEORII:
+            // Dodanie na poczatek seeda wyniku xora
+            seedElementList.add(0, executeXor(xorList));
+            // Dodanie do wyniku ostatniej wartości xora
+            result.add(seedElementList.get(seedElementList.size() - 1));
+            // Usuniecie z seeda ostatniej wartosci
+            seedElementList.remove(seedElementList.size() - 1);
         }
-
-        System.out.println(result);
+        return result;
     }
 
     // Funkcja xorująca (jeżeli xor ma wszystkie wartości=1 lub wszystkie wartości=0, zwróć 0 jako wynik
@@ -95,7 +65,26 @@ public class Generator {
                .max(Integer::compare)
                .get();
 
+       // Jeżeli min == max, to znaczy że w xorList są albo same jedynki albo same 0
         return min == max ? 0 : 1;
+    }
+
+
+    // Rozszyfrowywanie wielomianu -> w tym momencie wczytuje poprawnie tylko w formacie np. "1x0+1x1+1x4"
+    // TODO: obsłużyć sytuację, kiedy przed "x" nie ma "1" lub zwalidować tak żeby nie dało się tak wpisać
+    // TODO: obsłużyć sytuację, kiedy po "x" nie ma potęgi "0" lub zwalidować tak żeby nie dało się tak wpisać
+    private List<PolynomialComponent> extractPolynomial(String polynomial){
+        List<PolynomialComponent> polynomialComponentList = new ArrayList<>();
+        // Wyrazy wielomianu rodzielane są znakiem "+"
+        String[] components = polynomial.split("\\+");
+        for (String component:components) {
+            // Współczynnik i stopień wielomianu rozdzielane są znakiem "x"
+            String[] polynomialContent = component.split("x");
+            // Tworzenie obiektów klasy PolynomialComponent i dodanie ich do zwracanej listy
+            PolynomialComponent polynomialComponent = new PolynomialComponent(Integer.parseInt(polynomialContent[0]), Integer.parseInt(polynomialContent[1]));
+            polynomialComponentList.add(polynomialComponent);
+        }
+        return polynomialComponentList;
     }
 
     // Wyraz wielomianu, czyli np "2x^4" -> w tym przypadku 2 to coefficient, a 4 to degree
