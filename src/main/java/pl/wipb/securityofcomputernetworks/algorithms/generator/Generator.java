@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +24,9 @@ public class Generator {
 
         // Przekonwertowanie wielomianu ze stringa na listę obiektów typu PolynomialComponent
         List<PolynomialComponent> polynomialComponentList = extractPolynomial(polynomial);
+        if(polynomialComponentList == null){
+            return "Niepoprawny format! Wprowadź wielomiat według wzoru: 1x0+2x1+5x3";
+        }
         int maxDegree = polynomialComponentList.stream().max(Comparator.comparing(PolynomialComponent::getDegree)).get().getDegree();
 
         // Przekonwertowanie ziarna
@@ -83,20 +85,26 @@ public class Generator {
 
 
     // Rozszyfrowywanie wielomianu -> w tym momencie wczytuje poprawnie tylko w formacie np. "1x0+1x1+1x4"
-    // TODO: obsłużyć sytuację, kiedy przed "x" nie ma "1" lub zwalidować tak żeby nie dało się tak wpisać
-    // TODO: obsłużyć sytuację, kiedy po "x" nie ma potęgi "0" lub zwalidować tak żeby nie dało się tak wpisać
     private List<PolynomialComponent> extractPolynomial(String polynomial){
-        List<PolynomialComponent> polynomialComponentList = new ArrayList<>();
-        // Wyrazy wielomianu rodzielane są znakiem "+"
-        String[] components = polynomial.split("\\+");
-        for (String component:components) {
-            // Współczynnik i stopień wielomianu rozdzielane są znakiem "x"
-            String[] polynomialContent = component.split("x");
-            // Tworzenie obiektów klasy PolynomialComponent i dodanie ich do zwracanej listy
-            PolynomialComponent polynomialComponent = new PolynomialComponent(Integer.parseInt(polynomialContent[0]), Integer.parseInt(polynomialContent[1]));
-            polynomialComponentList.add(polynomialComponent);
+        try{
+            List<PolynomialComponent> polynomialComponentList = new ArrayList<>();
+            // Wyrazy wielomianu rodzielane są znakiem "+"
+            String[] components = polynomial.split("\\+");
+            for (String component:components) {
+                // Współczynnik i stopień wielomianu rozdzielane są znakiem "x"
+                String[] polynomialContent = component.split("x");
+                // Tworzenie obiektów klasy PolynomialComponent i dodanie ich do zwracanej listy
+                if(polynomialContent.length != 2){
+                    return null;
+                }
+                PolynomialComponent polynomialComponent = new PolynomialComponent(Integer.parseInt(polynomialContent[0]), Integer.parseInt(polynomialContent[1]));
+                polynomialComponentList.add(polynomialComponent);
+            }
+            return polynomialComponentList;
+
+        } catch (NumberFormatException numberFormatException){
+            return null;
         }
-        return polynomialComponentList;
     }
 
     // Wyraz wielomianu, czyli np "2x^4" -> w tym przypadku 2 to coefficient, a 4 to degree
