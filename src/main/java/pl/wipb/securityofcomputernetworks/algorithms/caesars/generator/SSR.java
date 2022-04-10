@@ -1,5 +1,6 @@
 package pl.wipb.securityofcomputernetworks.algorithms.caesars.generator;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
@@ -17,9 +18,32 @@ public class SSR {
         this.generator = generator;
     }
 
+    private static String validate(String message, String seed) {
+        String regex = "[0-1]+";
+        if (!message.matches(regex) || !seed.matches(regex)) {
+            return String.format("Provided incorrect data. Pattern of message: %s and seed: %s must match %s", message, seed, regex);
+        }
+        return Strings.EMPTY;
+    }
+
+    public static List<Integer> setPriorityXor(int[] seed) {
+        List<Integer> bitQueueXor = new ArrayList<>();
+        for (int i = 0; i < seed.length; i++) {
+            if (seed[i] == 1) {
+                bitQueueXor.add(i);
+            }
+        }
+        return bitQueueXor;
+    }
+
     @GetMapping("/SSR")
     public String SSR(String message, String polynomial, String seed) throws Exception {
-        validate(message, seed);
+        // walidowanie tylko ziarna i wiadomosci
+        String validation = validate(message, seed);
+        if (Strings.isNotEmpty(validation)) {
+            return validation;
+        }
+
         String generatedByLfsr = this.generator.gen(polynomial, seed, message.length());
 
         // rozkodowanie String'a do postaci tablicy intów
@@ -39,26 +63,6 @@ public class SSR {
         }
         return resultAppender.toString();
     }
-
-
-    private static void validate(String message, String seed) {
-        String regex = "[0-9]+";
-        if (!message.matches(regex) || !seed.matches(regex)) {
-            System.err.println("Provided incorrect data");
-            System.exit(0);
-        }
-    }
-
-    public static List<Integer> setPriorityXor(int[] seed) {
-        List<Integer> bitQueueXor = new ArrayList<>();
-        for (int i = 0; i < seed.length; i++) {
-            if (seed[i] == 1) {
-                bitQueueXor.add(i);
-            }
-        }
-        return bitQueueXor;
-    }
-
 
 
 }
