@@ -48,7 +48,9 @@ public class Generator {
             // Przejście po wszystkich wyrazach wielomianu
             for (PolynomialComponent component : polynomialComponentList) {
                 // Wywołanie operacji xor dla elementu, który znajduje się na pozycji takiej, jak stopień wielomianu
-                xorList.add(seedElementList.get(component.degree));
+                if(component.degree!=0) {
+                    xorList.add(seedElementList.get(component.degree - 1));
+                }
             }
 
             // SLAJD 10 Z TEORII:
