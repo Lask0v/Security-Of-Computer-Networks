@@ -18,7 +18,7 @@ public class SSR {
     }
 
     @GetMapping("/SSR")
-    public String SSR(String message, String polynomial, String seed) {
+    public String SSR(String message, String polynomial, String seed) throws Exception {
         validate(message, seed);
         String generatedByLfsr = this.generator.gen(polynomial, seed, message.length());
 
