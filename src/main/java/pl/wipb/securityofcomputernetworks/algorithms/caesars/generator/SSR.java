@@ -30,12 +30,12 @@ public class SSR {
                         .replaceAll("\\W", "").split(""))
                 .mapToInt(Integer::valueOf).toArray();
         // lista przechowujaca wartosci 1 (potegi) -> 1010 da nam 0 i 2 bo 1 w ziarnie znajduje sie na 1-szym i trzecim bicie
-        List<Integer> integers = setPriorityXor(seedArray);
+        List<Integer> positionsOfOne = setPriorityXor(seedArray);
         StringBuilder resultAppender = new StringBuilder();
         for (int i = 0; i < message.length(); i++) {
             resultAppender.append(UtilsEncoder.XOR(generatedByLfsrCode[i], messageArray[i]));
             System.arraycopy(generatedByLfsrCode, 0, generatedByLfsrCode, 1, generatedByLfsrCode.length - 1);
-            generatedByLfsrCode[0] = UtilsEncoder.processXOR(integers, generatedByLfsrCode);
+            generatedByLfsrCode[0] = UtilsEncoder.processXOR(positionsOfOne, generatedByLfsrCode);
         }
         return resultAppender.toString();
     }
