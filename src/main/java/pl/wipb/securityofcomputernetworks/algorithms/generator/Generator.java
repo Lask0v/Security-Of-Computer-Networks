@@ -47,10 +47,8 @@ public class Generator {
             xorList = new ArrayList<>();
             // Przejście po wszystkich wyrazach wielomianu
             for (PolynomialComponent component : polynomialComponentList) {
-                if (component.degree != 0) {
-                    // Wywołanie operacji xor dla elementu, który znajduje się na pozycji takiej, jak stopień wielomianu
-                    xorList.add(seedElementList.get(component.degree - 1));
-                }
+                // Wywołanie operacji xor dla elementu, który znajduje się na pozycji takiej, jak stopień wielomianu
+                xorList.add(seedElementList.get(component.degree));
             }
 
             // SLAJD 10 Z TEORII:
@@ -61,7 +59,14 @@ public class Generator {
             // Usuniecie z seeda ostatniej wartosci
             seedElementList.remove(seedElementList.size() - 1);
         }
-        return result.toString();
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Integer integer:result) {
+            stringBuilder.append(integer);
+        }
+
+        return stringBuilder.toString();
     }
 
     // Sprawdza, czy długość ziarna nie jest krótsza niż stopień wielomianu
@@ -93,16 +98,19 @@ public class Generator {
             for (String component:components) {
                 // Współczynnik i stopień wielomianu rozdzielane są znakiem "x"
                 String[] polynomialContent = component.split("x");
-                // Tworzenie obiektów klasy PolynomialComponent i dodanie ich do zwracanej listy
+                // Sprawdzenie, czy przed i po "x" znajduje się jakaś liczba - w przeciwnym wypadku wyświetlenie informacji o błędnym formacie wielomianu
                 if(polynomialContent.length != 2){
                     return null;
                 }
+                // Tworzenie obiektów klasy PolynomialComponent i dodanie ich do zwracanej listy
                 PolynomialComponent polynomialComponent = new PolynomialComponent(Integer.parseInt(polynomialContent[0]), Integer.parseInt(polynomialContent[1]));
                 polynomialComponentList.add(polynomialComponent);
             }
             return polynomialComponentList;
 
         } catch (NumberFormatException numberFormatException){
+            // Sprawdzenie, czy wokół "x" podane są cyfry i czy nie ma niepotrzebnych spacji między znakami - w przeciwnym wypadku wyświetlenie informacji
+            // o błędnym formacie wielomianu
             return null;
         }
     }
