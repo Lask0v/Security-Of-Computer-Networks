@@ -8,6 +8,7 @@ import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 import pl.wipb.securityofcomputernetworks.utils.UtilsEncoder;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -29,53 +30,42 @@ public class SSR {
         return Strings.EMPTY;
     }
 
-    @RequestMapping(
-            path = "/upload",
-            method = RequestMethod.POST,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public byte[] ssrFile(@RequestPart("file") MultipartFile file,
-                          @RequestPart("polynomial") String polynomial,
-                          @RequestParam("seed") String seed) throws Exception {
-
-        StringBuilder message = new StringBuilder();
-
-        byte[] encode = Base64.getEncoder().encode(file.getBytes());
-        for (byte b : encode) {
-            message.append(b);
+    @GetMapping("/encrypt")
+    public String encrypt(@RequestParam String message, @RequestParam String seed, @RequestParam String polynomial) throws Exception {
+        String password = "";
+        message = convertStringToBinary(message);
+        String lfsr = generator.gen(polynomial, seed, message.length());
+        for (int i = 0; i < message.length(); i++) {
+            int generatedBit = lfsr.charAt(i);
+            int messageBit = message.charAt(i);
+            password += generatedBit ^ messageBit;
         }
-        String text = text123(message.toString(), polynomial, seed);
-        return text.getBytes();
+        return binaryToText(password);
     }
 
-    /*
-     Endpoint to encrypt text message
-     */
-    @GetMapping(value = "/text")
-    private String text(String message, String polynomial, String seed) throws Exception {
-        String generatedByLfsr = this.generator.gen(polynomial, seed, message.length());
-        logger.info(generatedByLfsr);
-        byte[] x = message.getBytes(StandardCharsets.UTF_8);
-        byte[] z = generatedByLfsr.getBytes(StandardCharsets.UTF_8);
-        byte[] y = new byte[message.length()];
-        for (int i = 0; i < message.length(); i++) {
-            y[i] = (byte) UtilsEncoder.XOR(z[i], x[i]);
+    public static String convertStringToBinary(String input) {
+
+        StringBuilder result = new StringBuilder();
+        char[] chars = input.toCharArray();
+        for (char aChar : chars) {
+            result.append(
+                    String.format("%8s", Integer.toBinaryString(aChar))
+                            .replaceAll(" ", "0")
+            );
         }
-        return new String(y);
+        return result.toString();
+
     }
 
-
-    @GetMapping("/text123")
-    private String text123(String message, String polynomial, String seed) throws Exception {
-        String generatedByLfsr = this.generator.gen(polynomial, seed, message.length());
-        logger.info(generatedByLfsr);
-        byte[] x = message.getBytes(StandardCharsets.UTF_8);
-        byte[] z = generatedByLfsr.getBytes(StandardCharsets.UTF_8);
-        byte[] y = new byte[message.length()];
-        for (int i = 0; i < message.length(); i++) {
-            y[i] = (byte) UtilsEncoder.XOR(z[i], x[i]);
-        }
-        org.apache.commons.codec.binary.Base64 base64 = new org.apache.commons.codec.binary.Base64();
-        return new String(base64.encode(new String(y).getBytes()));
+    public static String binaryToText(String binary) {
+        return Arrays.stream(binary.split("(?<=\\G.{8})"))
+                .parallel()
+                .map(eightBits -> (char)Integer.parseInt(eightBits, 2))
+                .collect(
+                        StringBuilder::new,
+                        StringBuilder::append,
+                        StringBuilder::append
+                ).toString();
     }
 
 }
