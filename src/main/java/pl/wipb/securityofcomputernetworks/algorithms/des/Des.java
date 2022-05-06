@@ -6,6 +6,7 @@ import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
@@ -37,12 +38,11 @@ public class Des {
             rightBlock[i] = output[i + 32];
         }
 
-
         // KROK 4
-        // Klucz w tabeli jednowymiarowej
         boolean[] leftKeyBlock = new boolean[26];
         boolean[] rightKeyBlock = new boolean[26];
 
+        // Klucz w tabeli jednowymiarowej
         boolean[] keysArray = new boolean[64];
         int counter = 0;
         for (int i = 0; i < keys.length; i++) {
@@ -55,14 +55,73 @@ public class Des {
         // W newKeysArray jest teraz 56 elementów
         boolean[] newKeysArray = permutedChoice(keysArray);
 
+        // KROK 5
         // Dzielenie klucza na pół
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 28; i++) {
             leftKeyBlock[i] = newKeysArray[i];
-            rightKeyBlock[i] = newKeysArray[i + 26];
+            rightKeyBlock[i] = newKeysArray[i + 28];
         }
 
-        //TODO:
+        // KROK 6
+        // TODO:
 
+
+
+        // KROK 7
+        // TODO:
+
+
+        // KROK 8
+        // TODO:
+
+
+        // KROK 9
+        // TODO:
+
+
+        // KROK 10
+        // TODO:
+
+
+        // KROK 11
+        // TODO:
+
+
+        // KROK 12
+        // TODO:
+
+
+        // KROK 13
+        // TODO:
+
+
+        // KROK 14
+        // TODO:
+
+
+        // KROK 15
+        // TODO:
+
+
+        // KROK 16
+        // TODO:
+
+
+        // KROK 17
+        // TODO:
+
+
+        // KROK 18
+        // TODO:
+
+
+
+
+
+        // TODO:
+        return output;
+
+        /*
         // 16 Iteracji podczas kodowania wiadomosci - funkcje Feistela
         for (int i = 0; i < 15; i++) {
             leftTemporaryBlock = Arrays.copyOf(leftBlock, leftBlock.length);
@@ -90,7 +149,20 @@ public class Des {
             output[i + 32] = rightBlock[i];
         }
         output = finalPermutation(output);
-        return output;
+        return output;*/
+
+    }
+
+    private static int convertBooleanArrayToBinaryNumber(boolean[] booleanArray){
+        StringBuilder number = new StringBuilder();
+        for (boolean element : booleanArray){
+            if(element){
+                number.append("1");
+            } else {
+                number.append("0");
+            }
+        }
+        return Integer.parseInt(number.toString());
     }
 
     // Początkowa permutacja bloku

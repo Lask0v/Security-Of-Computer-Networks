@@ -1,5 +1,10 @@
 package pl.wipb.securityofcomputernetworks.algorithms.des;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class ConstantTables {
     public static final int[] IP = {
             58, 50, 42, 34, 26, 18, 10, 2,
@@ -23,6 +28,18 @@ public class ConstantTables {
             33, 1, 41, 9, 49, 17, 57, 25
     };
 
+    public static final List<Integer> PC_1_ONE_DIM = new ArrayList<>(
+            Arrays.asList(
+                    57, 49, 41, 33, 25, 17, 9,
+                    1, 58, 50, 42, 34, 26, 18,
+                    10, 2, 59, 51, 43, 35, 27,
+                    19, 11, 3, 60, 52, 44, 36,
+                    63, 55, 47, 39, 31, 23, 15,
+                    7, 62, 54, 46, 38, 30, 22,
+                    14, 6, 61, 53, 45, 37, 29,
+                    21, 13, 5, 28, 20, 12, 4
+            ));
+
     public static final int[][] PC_1 = {
             {57, 49, 41, 33, 25, 17, 9},
             {1, 58, 50, 42, 34, 26, 18},
@@ -35,6 +52,10 @@ public class ConstantTables {
     };
 
     public static final int[] LEFT_SHIFTS_ITERATIONS = {
+            1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
+    };
+
+    public static final int[] SHIFTS_ITERATIONS = {
             1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
     };
 
