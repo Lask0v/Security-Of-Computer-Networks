@@ -31,11 +31,37 @@ public class Des {
         boolean[] leftBlock = new boolean[32];
         boolean[] rightBlock = new boolean[32];
 
-        // Dzielenie klucza na pół
+        // Dzielenie bloku na pół
         for (int i = 0; i < 32; i++) {
             leftBlock[i] = output[i];
             rightBlock[i] = output[i + 32];
         }
+
+
+        // KROK 4
+        // Klucz w tabeli jednowymiarowej
+        boolean[] leftKeyBlock = new boolean[26];
+        boolean[] rightKeyBlock = new boolean[26];
+
+        boolean[] keysArray = new boolean[64];
+        int counter = 0;
+        for (int i = 0; i < keys.length; i++) {
+            for (int j = 0; j < keys[i].length; j++) {
+                keysArray[counter] = keys[i][j];
+            }
+        }
+
+        // Zastosowanie na kluczu permutowanego wyboru
+        // W newKeysArray jest teraz 56 elementów
+        boolean[] newKeysArray = permutedChoice(keysArray);
+
+        // Dzielenie klucza na pół
+        for (int i = 0; i < 26; i++) {
+            leftKeyBlock[i] = newKeysArray[i];
+            rightKeyBlock[i] = newKeysArray[i + 26];
+        }
+
+        //TODO:
 
         // 16 Iteracji podczas kodowania wiadomosci - funkcje Feistela
         for (int i = 0; i < 15; i++) {
@@ -83,6 +109,19 @@ public class Des {
             output[i] = input[ConstantTables.INVERTED_IP[i] - 1];
         }
         return output;
+    }
+
+    // Permutacja PC
+    public static boolean[] permutedChoice(boolean[] input){
+        boolean[] newTable = new boolean[56];
+        int counter = 0;
+        for (int i = 0; i < ConstantTables.PC_1.length; i++) {
+            for (int j = 0; j < ConstantTables.PC_1[i].length; j++) {
+                newTable[counter] = input[ConstantTables.PC_1[i][j]];
+                counter++;
+            }
+        }
+        return newTable;
     }
 
     // Funkcja Feistela
