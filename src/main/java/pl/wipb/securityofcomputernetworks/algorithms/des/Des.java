@@ -1,12 +1,14 @@
 package pl.wipb.securityofcomputernetworks.algorithms.des;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.*;
 import java.util.logging.Logger;
 
 @RestController
@@ -17,6 +19,31 @@ public class Des {
 
     Des(Generator generator) {
         this.generator = generator;
+    }
+
+    public static String encode(MultipartFile file, String key) throws IOException, DecoderException {
+        byte[] buffer = new byte[8];
+        InputStream inputStream = file.getInputStream();
+        while(inputStream.read(buffer) != -1) {
+            //Krok pierwszy
+            String correctedHexMessage = fillBlockIfMessageIsNotEqualDivided(encodeByteArrayToHex(buffer));
+
+
+        }
+        return Strings.EMPTY;
+    }
+
+    /**
+     * Znak ma rozmiar 2 bajtów (czyli 16 bitów).
+     * Dodaj 0 na końcu, jeśli wiadomość heksadecymalna nie jest równa blokom 64-bitowym.
+     * @return Poprawioną wiadomość, z równo podzielonymi blokami gotową do kodowania
+     */
+    private static String fillBlockIfMessageIsNotEqualDivided(String hexMessage) {
+        StringBuilder correctedMessage = new StringBuilder(hexMessage);
+        for (int i = 0; i < 16 - (hexMessage.length() % 16); i++) {
+            correctedMessage.append("0");
+        }
+        return correctedMessage.toString();
     }
 
     // Permutacja na wiadomości 64 bitowej
@@ -255,4 +282,14 @@ public class Des {
         }
         return output;
     }
+
+    public static String encodeByteArrayToHex(byte[] bytes) {
+        return Hex.encodeHexString(bytes);
+    }
+
+    public static byte[] decodeHexToByteArray(String hexString)
+            throws DecoderException {
+        return Hex.decodeHex(hexString);
+    }
+
 }
