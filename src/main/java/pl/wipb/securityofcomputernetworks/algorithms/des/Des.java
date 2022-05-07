@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class Des {
     private static final int NUMBER_OF_ITERATIONS = 16;
     private final Generator generator;
-    private static final Logger logger = Logger.getLogger(getClass().toString());
+    private static final Logger logger = Logger.getLogger(Des.class.toString());
 
     Des(Generator generator) {
         this.generator = generator;
