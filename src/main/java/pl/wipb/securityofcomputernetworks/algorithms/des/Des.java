@@ -2,18 +2,21 @@ package pl.wipb.securityofcomputernetworks.algorithms.des;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/DES")
 public class Des {
+    private static final int NUMBER_OF_ITERATIONS = 16;
     private final Generator generator;
     private final Logger logger = Logger.getLogger(getClass().toString());
 
@@ -21,12 +24,13 @@ public class Des {
         this.generator = generator;
     }
 
-    public static String encode(MultipartFile file, String key) throws IOException, DecoderException {
+    public static String encode(MultipartFile file, String key) throws IOException {
         byte[] buffer = new byte[8];
         InputStream inputStream = file.getInputStream();
-        while(inputStream.read(buffer) != -1) {
+        while (inputStream.read(buffer) != -1) {
             //Krok pierwszy
             String correctedHexMessage = fillBlockIfMessageIsNotEqualDivided(encodeByteArrayToHex(buffer));
+            processEncryption(correctedHexMessage, key);
 
 
         }
@@ -36,6 +40,7 @@ public class Des {
     /**
      * Znak ma rozmiar 2 bajtów (czyli 16 bitów).
      * Dodaj 0 na końcu, jeśli wiadomość heksadecymalna nie jest równa blokom 64-bitowym.
+     *
      * @return Poprawioną wiadomość, z równo podzielonymi blokami gotową do kodowania
      */
     private static String fillBlockIfMessageIsNotEqualDivided(String hexMessage) {
@@ -45,6 +50,87 @@ public class Des {
         }
         return correctedMessage.toString();
     }
+
+    public static String processEncryption(String hexMessage, String hexKey) {
+//        encrypt( BooleanUtils.toBoolean(Integer.parseInt(hexMessage, 16)),
+//        ;)
+
+        boolean[] input = hexToBooleanArray(hexMessage);
+        boolean[] keys = hexToBooleanArray(hexKey);
+        return null;
+    }
+
+    //    KROK 4
+    private static boolean[] reduceKey(boolean[] key) {
+        boolean[] reducedKey = new boolean[56];
+        int[] flattedArray = flatArrayTwoDimensionalIntoOneDimensionalArray(ConstantTables.PC_1);
+        for (int i = 0; i < reducedKey.length; i++) {
+            for (int i1 : flattedArray) {
+                reducedKey[i] = key[i1];
+            }
+        }
+        return reducedKey;
+    }
+
+    //    KROK 5
+    private static boolean[][] separateKey(boolean[] reducedKey) {
+        boolean[] leftPartKey = new boolean[reducedKey.length / 2];
+        boolean[] rightPartKey = new boolean[reducedKey.length / 2];
+        boolean inputToLeftPartKey = true;
+        for (int i = 0; i < reducedKey.length; i++) {
+            if (inputToLeftPartKey) {
+                leftPartKey[i] = reducedKey[i];
+            } else {
+                rightPartKey[i] = reducedKey[i];
+            }
+            if (i == reducedKey.length / 2) {
+                inputToLeftPartKey = false;
+            }
+            shuffle(leftPartKey,rightPartKey);
+        }
+// FIXME: 07.05.2022 to czeba bedzie naprawic
+        return null;
+    }
+
+    //    KROK 6
+// TODO: 07.05.2022 6. W każdej z 28-bitowych części klucza robimy przesunięcie w lewo o X bitów,
+//  gdzie ilość bitów jest określana w tabeli obok numeru iteracji który robimy dla danego 64-bitowego bloku.
+//  Tych iteracji jest 16.
+    private static void shuffle(boolean[] leftPartKey, boolean[] rightPartKey) {
+        for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
+            for (int j = 0; j < leftPartKey.length; j++) {
+                if (i <= 1 || i == 8 || i == 15) {
+                    leftPartKey[j] = leftPartKey[j << 1];
+                    rightPartKey[j] = rightPartKey[j << 1];
+                } else {
+                    leftPartKey[j] = leftPartKey[j << 2];
+                    rightPartKey[j] = rightPartKey[j << 2];
+                }
+            }
+        }
+    }
+    // TODO: 07.05.2022 7. Dla każdej iteracji powstaje klucz Kn, który tworzymy łącząc bloki Cn i Dn, a następnie ich
+    //połączenie permutując ciągiem permutowanego wyboru 2 (Permuted Choice 2 – PC2):
+
+    private static int[] flatArrayTwoDimensionalIntoOneDimensionalArray(int[][] array) {
+        int[] flattedArray = new int[array.length * array[0].length];
+        int counter = 0;
+        for (int[] row : array) {
+            for (int cell : row) {
+                flattedArray[counter++] = cell;
+            }
+        }
+        return flattedArray;
+    }
+
+    private static boolean[] hexToBooleanArray(String hex) {
+        boolean[] result = new boolean[hex.length()];
+        for (int i = 0; i < hex.length(); i++) {
+            result[i] = BooleanUtils.toBoolean(Integer.parseInt(String.valueOf(hex.charAt(i)), 2));
+        }
+        return result;
+    }
+
 
     // Permutacja na wiadomości 64 bitowej
     public static boolean[] encrypt(boolean[] input, boolean[][] keys) {
@@ -91,7 +177,6 @@ public class Des {
 
         // KROK 6
         // TODO:
-
 
 
         // KROK 7
@@ -142,9 +227,6 @@ public class Des {
         // TODO:
 
 
-
-
-
         // TODO:
         return output;
 
@@ -180,10 +262,10 @@ public class Des {
 
     }
 
-    private static int convertBooleanArrayToBinaryNumber(boolean[] booleanArray){
+    private static int convertBooleanArrayToBinaryNumber(boolean[] booleanArray) {
         StringBuilder number = new StringBuilder();
-        for (boolean element : booleanArray){
-            if(element){
+        for (boolean element : booleanArray) {
+            if (element) {
                 number.append("1");
             } else {
                 number.append("0");
@@ -211,7 +293,7 @@ public class Des {
     }
 
     // Permutacja PC
-    public static boolean[] permutedChoice(boolean[] input){
+    public static boolean[] permutedChoice(boolean[] input) {
         boolean[] newTable = new boolean[56];
         int counter = 0;
         for (int i = 0; i < ConstantTables.PC_1.length; i++) {
