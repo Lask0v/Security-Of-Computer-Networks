@@ -12,6 +12,10 @@ import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
@@ -99,6 +103,32 @@ public class Des {
 //  Tych iteracji jest 16.
     private static void shuffle(boolean[] leftPartKey, boolean[] rightPartKey) {
         int lengthPartKey = -1;
+        lengthPartKey = getValidatedKey(leftPartKey, rightPartKey, lengthPartKey);
+        List<Boolean> leftPartKeyArray = convertArrayToList(leftPartKey);
+        List<Boolean> rightPartKeyArray = convertArrayToList(rightPartKey);
+
+        for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
+            for (int j = 0; j < lengthPartKey; j++) {
+                if (i <= 1 || i == 8 || i == 15) {
+                    Collections.rotate(leftPartKeyArray,1);
+                    Collections.rotate(rightPartKeyArray,1);
+                } else {
+                    Collections.rotate(leftPartKeyArray,2);
+                    Collections.rotate(rightPartKeyArray,2);
+                }
+            }
+        }
+    }
+
+    private static List<Boolean> convertArrayToList(boolean[] array) {
+        ArrayList<Boolean> booleans = new ArrayList<>();
+        for (boolean b : array) {
+            booleans.add(b);
+        }
+        return booleans;
+    }
+
+    private static int getValidatedKey(boolean[] leftPartKey, boolean[] rightPartKey, int lengthPartKey) {
         if (leftPartKey.length == rightPartKey.length) {
             lengthPartKey = leftPartKey.length;
         }
@@ -106,17 +136,7 @@ public class Des {
             logger.warning("Keys are not equal");
             System.exit(0);
         }
-        for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
-            for (int j = 0; j < lengthPartKey; j++) {
-                if (i <= 1 || i == 8 || i == 15) {
-                    leftPartKey[j] = leftPartKey[j << 1];
-                    rightPartKey[j] = rightPartKey[j << 1];
-                } else {
-                    leftPartKey[j] = leftPartKey[j << 2];
-                    rightPartKey[j] = rightPartKey[j << 2];
-                }
-            }
-        }
+        return lengthPartKey;
     }
     // TODO: 07.05.2022 7. Dla każdej iteracji powstaje klucz Kn, który tworzymy łącząc bloki Cn i Dn, a następnie ich
     //połączenie permutując ciągiem permutowanego wyboru 2 (Permuted Choice 2 – PC2):
