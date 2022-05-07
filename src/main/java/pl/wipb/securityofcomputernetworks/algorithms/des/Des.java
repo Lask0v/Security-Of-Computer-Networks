@@ -1,5 +1,6 @@
 package pl.wipb.securityofcomputernetworks.algorithms.des;
 
+import com.google.common.primitives.Booleans;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.BooleanUtils;
@@ -12,18 +13,21 @@ import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping(value = "/DES")
 public class Des {
     private static final int NUMBER_OF_ITERATIONS = 16;
-    private static final int SINGLE_SHIFT = 1;
-    private static final int DOUBLE_SHIFT = 2;
-    private final Generator generator;
+    private static final int SINGLE_SHIFT_IN_LEFT = -1;
+    private static final int DOUBLE_SHIFT_IN_LEFT = -2;
     private static final Logger logger = Logger.getLogger(Des.class.toString());
+    private final Generator generator;
 
     Des(Generator generator) {
         this.generator = generator;
@@ -91,7 +95,7 @@ public class Des {
             if (i == reducedKey.length / 2) {
                 inputToLeftPartKey = false;
             }
-            shuffle(leftPartKey,rightPartKey);
+            shiftInLeft(leftPartKey, rightPartKey);
         }
 // FIXME: 07.05.2022 to czeba bedzie naprawic
         return null;
@@ -101,23 +105,39 @@ public class Des {
 // TODO: 07.05.2022 6. W każdej z 28-bitowych części klucza robimy przesunięcie w lewo o X bitów,
 //  gdzie ilość bitów jest określana w tabeli obok numeru iteracji który robimy dla danego 64-bitowego bloku.
 //  Tych iteracji jest 16.
-    private static void shuffle(boolean[] leftPartKey, boolean[] rightPartKey) {
+    private static boolean[] shiftInLeft(boolean[] leftPartKey, boolean[] rightPartKey) {
         int lengthPartKey = -1;
         lengthPartKey = getValidatedKey(leftPartKey, rightPartKey, lengthPartKey);
-        List<Boolean> leftPartKeyArray = convertArrayToList(leftPartKey);
-        List<Boolean> rightPartKeyArray = convertArrayToList(rightPartKey);
-
+        List<Boolean> leftPartKeyList = convertArrayToList(leftPartKey);
+        List<Boolean> rightPartKeyList = convertArrayToList(rightPartKey);
+        boolean[] keyAfterPermutation = new boolean[lengthPartKey * 2];
         for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
             for (int j = 0; j < lengthPartKey; j++) {
                 if (i <= 1 || i == 8 || i == 15) {
-                    Collections.rotate(leftPartKeyArray, SINGLE_SHIFT);
-                    Collections.rotate(rightPartKeyArray, SINGLE_SHIFT);
+                    Collections.rotate(leftPartKeyList, SINGLE_SHIFT_IN_LEFT);
+                    Collections.rotate(rightPartKeyList, SINGLE_SHIFT_IN_LEFT);
                 } else {
-                    Collections.rotate(leftPartKeyArray, DOUBLE_SHIFT);
-                    Collections.rotate(rightPartKeyArray,DOUBLE_SHIFT);
+                    Collections.rotate(leftPartKeyList, DOUBLE_SHIFT_IN_LEFT);
+                    Collections.rotate(rightPartKeyList, DOUBLE_SHIFT_IN_LEFT);
                 }
             }
+            keyAfterPermutation = permutedChoiceSecond
+                    (
+                            Booleans.toArray(Stream.of(leftPartKeyList, rightPartKeyList)
+                                            .flatMap(Collection::stream)
+                                            .collect(Collectors.toList()))
+                    );
         }
+        return keyAfterPermutation;
+    }
+
+    //    KROK 7
+    private static boolean[] permutedChoiceSecond(boolean[] key) {
+        int[] ints = flatArrayTwoDimensionalIntoOneDimensionalArray(ConstantTables.PC_2);
+        for (int i = 0; i < ints.length; i++) {
+            key[i] = key[ints[i]];
+        }
+        return key;
     }
 
     private static List<Boolean> convertArrayToList(boolean[] array) {
