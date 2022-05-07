@@ -11,6 +11,7 @@ import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.util.logging.Logger;
 
 @RestController
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 public class Des {
     private static final int NUMBER_OF_ITERATIONS = 16;
     private final Generator generator;
-    private final Logger logger = Logger.getLogger(getClass().toString());
+    private static final Logger logger = Logger.getLogger(getClass().toString());
 
     Des(Generator generator) {
         this.generator = generator;
@@ -97,8 +98,16 @@ public class Des {
 //  gdzie ilość bitów jest określana w tabeli obok numeru iteracji który robimy dla danego 64-bitowego bloku.
 //  Tych iteracji jest 16.
     private static void shuffle(boolean[] leftPartKey, boolean[] rightPartKey) {
+        int lengthPartKey = -1;
+        if (leftPartKey.length == rightPartKey.length) {
+            lengthPartKey = leftPartKey.length;
+        }
+        if (lengthPartKey < 0) {
+            logger.warning("Keys are not equal");
+            System.exit(0);
+        }
         for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
-            for (int j = 0; j < leftPartKey.length; j++) {
+            for (int j = 0; j < lengthPartKey; j++) {
                 if (i <= 1 || i == 8 || i == 15) {
                     leftPartKey[j] = leftPartKey[j << 1];
                     rightPartKey[j] = rightPartKey[j << 1];
