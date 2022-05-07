@@ -11,9 +11,7 @@ import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,6 +20,8 @@ import java.util.logging.Logger;
 @RequestMapping(value = "/DES")
 public class Des {
     private static final int NUMBER_OF_ITERATIONS = 16;
+    private static final int SINGLE_SHIFT = 1;
+    private static final int DOUBLE_SHIFT = 2;
     private final Generator generator;
     private static final Logger logger = Logger.getLogger(Des.class.toString());
 
@@ -110,11 +110,11 @@ public class Des {
         for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
             for (int j = 0; j < lengthPartKey; j++) {
                 if (i <= 1 || i == 8 || i == 15) {
-                    Collections.rotate(leftPartKeyArray,1);
-                    Collections.rotate(rightPartKeyArray,1);
+                    Collections.rotate(leftPartKeyArray, SINGLE_SHIFT);
+                    Collections.rotate(rightPartKeyArray, SINGLE_SHIFT);
                 } else {
-                    Collections.rotate(leftPartKeyArray,2);
-                    Collections.rotate(rightPartKeyArray,2);
+                    Collections.rotate(leftPartKeyArray, DOUBLE_SHIFT);
+                    Collections.rotate(rightPartKeyArray,DOUBLE_SHIFT);
                 }
             }
         }
