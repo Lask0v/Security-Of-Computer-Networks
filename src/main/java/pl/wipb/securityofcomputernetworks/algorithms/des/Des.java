@@ -48,6 +48,17 @@ public class Des {
             processEncryption(correctedHexMessage, key);
         }
 
+    public static String encode(String str, String key) throws IOException {
+//        byte[] buffer = new byte[8];
+//        InputStream inputStream = file.getInputStream();
+//        while (inputStream.read(buffer) != -1) {
+//            //Krok pierwszy
+//            String correctedHexMessage = fillBlockIfMessageIsNotEqualDivided(encodeByteArrayToHex(buffer));
+//            processEncryption(correctedHexMessage, key);
+//
+//
+//        }
+        System.out.println(fillBlockIfMessageIsNotEqualDivided(str));
         return Strings.EMPTY;
     }
 
