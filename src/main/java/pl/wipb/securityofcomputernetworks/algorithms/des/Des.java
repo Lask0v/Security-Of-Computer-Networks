@@ -73,6 +73,15 @@ public class Des {
             }
 
             //Złączenie obu części w jedną tablicę
+            int[] combinedArray = new int[l.length + r.length];
+            System.arraycopy(r, 0, combinedArray, 0, r.length);
+            System.arraycopy(l, 0, combinedArray, l.length, r.length);
+
+            //Złączony blok 64-bitowy poddajemy odwróconej tablicy permutacji i dopisujemy do wyniku
+            int[] arrayAfterPermutation = permutation(combinedArray, ConstantTables.INVERTED_IP);
+            for (int k = 0; k < arrayAfterPermutation.length; k++) {
+                result.append(arrayAfterPermutation[k]);
+            }
 
 
             //Złączony blok 64-bitowy poddajemy odwróconej tablicy permutacji i dopisujemy do wyniku
@@ -379,14 +388,6 @@ public class Des {
     }
 
 
-    // Permutacja końcowa
-    public static boolean[] finalPermutation(boolean[] input) {
-        boolean[] output = new boolean[64];
-        for (int i = 0; i < 64; i++) {
-            output[i] = input[ConstantTables.INVERTED_IP[i] - 1];
-        }
-        return output;
-    }
 
 
 
