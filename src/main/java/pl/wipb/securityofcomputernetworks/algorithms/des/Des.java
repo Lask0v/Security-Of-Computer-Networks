@@ -93,16 +93,6 @@ public class Des {
         return null;
     }
 
-    //    KROK 2
-    private static boolean [] initialPermutationStepTwo(boolean[] inputData) {
-        boolean[] result = new boolean[inputData.length];
-        for (int i = 0; i < inputData.length; i++) {
-            for (int i1 : ConstantTables.IP) {
-                result[i] = inputData[i1];
-            }
-        }
-        return result;
-    }
 
     //    KROK 4
     private static boolean[] reduceKey(boolean[] key) {
@@ -229,7 +219,6 @@ public class Des {
     public static boolean[] encrypt(boolean[] input, boolean[][] keys) {
         // KROK 2
         //Poczatkowa permutacja na wiadomosci 64bitowej
-        boolean[] output = initialPermutation(input);
         boolean[] rightTemporaryBlock;
         boolean[] leftTemporaryBlock;
 
@@ -238,11 +227,6 @@ public class Des {
         boolean[] leftBlock = new boolean[32];
         boolean[] rightBlock = new boolean[32];
 
-        // Dzielenie bloku na pół
-        for (int i = 0; i < 32; i++) {
-            leftBlock[i] = output[i];
-            rightBlock[i] = output[i + 32];
-        }
 
         // KROK 4
         boolean[] leftKeyBlock = new boolean[26];
@@ -321,7 +305,7 @@ public class Des {
 
 
         // TODO:
-        return output;
+        return null;
 
         /*
         // 16 Iteracji podczas kodowania wiadomosci - funkcje Feistela
@@ -367,14 +351,6 @@ public class Des {
         return Integer.parseInt(number.toString());
     }
 
-    // Początkowa permutacja bloku
-    public static boolean[] initialPermutation(boolean[] input) {
-        boolean[] output = new boolean[64];
-        for (int i = 0; i < 64; i++) {
-            output[i] = input[ConstantTables.IP[i] - 1];
-        }
-        return output;
-    }
 
     // Permutacja końcowa
     public static boolean[] finalPermutation(boolean[] input) {
