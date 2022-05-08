@@ -124,8 +124,8 @@ public class Des {
             keyAfterPermutation = permutedChoiceSecond
                     (
                             Booleans.toArray(Stream.of(leftPartKeyList, rightPartKeyList)
-                                            .flatMap(Collection::stream)
-                                            .collect(Collectors.toList()))
+                                    .flatMap(Collection::stream)
+                                    .collect(Collectors.toList()))
                     );
         }
         return keyAfterPermutation;
@@ -180,6 +180,15 @@ public class Des {
         return result;
     }
 
+    //    KROK 8
+    private static boolean[] transform32BitInto48(boolean[] data) {
+        boolean[] result = new boolean[48];
+        int counter = 0;
+        for (int i : ConstantTables.E_FUNC) {
+            result[counter++] = data[i];
+        }
+        return result;
+    }
 
     // Permutacja na wiadomości 64 bitowej
     public static boolean[] encrypt(boolean[] input, boolean[][] keys) {
