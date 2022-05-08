@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping(value = "/DES")
 public class Des {
+    private static final int SIZE_OF_BLOCK = 64;
     private static final int NUMBER_OF_ITERATIONS = 16;
     private static final int SINGLE_SHIFT_IN_LEFT = -1;
     private static final int DOUBLE_SHIFT_IN_LEFT = -2;
@@ -58,7 +59,9 @@ public class Des {
 //
 //
 //        }
-        System.out.println(fillBlockIfMessageIsNotEqualDivided(str));
+        String textInBinary = fillBlockIfMessageIsNotEqualDivided(str);
+        int sumOfBlocks = textInBinary.length() / SIZE_OF_BLOCK;
+
         return Strings.EMPTY;
     }
 
