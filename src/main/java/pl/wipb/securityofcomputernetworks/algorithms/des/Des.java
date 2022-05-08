@@ -14,10 +14,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,19 +33,6 @@ public class Des {
         this.generator = generator;
     }
 
-    @RequestMapping(
-            path = "/upload",
-            method = RequestMethod.POST,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public static String encode(@RequestPart(required = true) MultipartFile file, @RequestParam String key) throws IOException {
-        InputStream inputStream = new BufferedInputStream(file.getInputStream());
-        byte[] buffer = new byte[8];
-        while (inputStream.read(buffer) != -1) {
-            //Krok pierwszy
-            String correctedHexMessage = fillBlockIfMessageIsNotEqualDivided(encodeByteArrayToHex(buffer));
-            processEncryption(correctedHexMessage, key);
-        }
-
     public static String encode(String str, String key) throws IOException {
 //        byte[] buffer = new byte[8];
 //        InputStream inputStream = file.getInputStream();
@@ -62,8 +46,29 @@ public class Des {
         String textInBinary = fillBlockIfMessageIsNotEqualDivided(str);
         int sumOfBlocks = textInBinary.length() / SIZE_OF_BLOCK;
 
+        convertTextToIntArrayAndDivideToBlocks(textInBinary, sumOfBlocks);
+
+
         return Strings.EMPTY;
     }
+
+    private static void convertTextToIntArrayAndDivideToBlocks(String textInBinary, int sumOfBlocks) {
+        //Konwersja na tablicę
+        int[] bitsInIntegerArray = new int[textInBinary.length()];
+        for (int i = 0; i < textInBinary.length(); i++) {
+            bitsInIntegerArray[i] = Integer.parseInt(textInBinary.charAt(i) + "");
+        }
+        System.out.println(Arrays.toString(bitsInIntegerArray));
+
+        //Podział na bloki
+        List<int[]> blocksInBinary = new LinkedList<>();
+        for (int i = 0; i < sumOfBlocks; i++) {
+            int[] singleBlock = Arrays.copyOfRange(bitsInIntegerArray, i * SIZE_OF_BLOCK, (i * SIZE_OF_BLOCK) + SIZE_OF_BLOCK);
+            blocksInBinary.add(singleBlock);
+        }
+        System.out.println(Arrays.toString(blocksInBinary.get(0)));
+    }
+
 
     /**
      * Znak ma rozmiar 2 bajtów (czyli 16 bitów).
