@@ -1,6 +1,5 @@
 package pl.wipb.securityofcomputernetworks.algorithms.des;
 
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -41,8 +40,8 @@ public class Des {
 
         for (int i = 0; i < sumOfBlocks; i++) {
             //Podział bloku na część lewą i prawą
-            int[] l = divideArrayToLeftBlock(dividedBlocksInBinary.get(i));
-            int[] r = divideArrayToRightBlock(dividedBlocksInBinary.get(i));
+            int[] leftBlock = divideArrayToLeftBlock(dividedBlocksInBinary.get(i));
+            int[] rightBlock = divideArrayToRightBlock(dividedBlocksInBinary.get(i));
 
             //Wykonanie 16 iteracji algorytmu
             for (int j = 0; j < 16; j++) {
@@ -50,15 +49,15 @@ public class Des {
                 for (int z = 0; z < keys.length; z++) {
                     nKey[z] = Integer.parseInt(keys[j].charAt(z) + "");
                 }
-                int[] prev = l;
-                l = r;
-                r = XORArrays(prev, function(nKey, r));
+                int[] previous = leftBlock;
+                leftBlock = rightBlock;
+                rightBlock = XORArrays(previous, function(nKey, rightBlock));
             }
 
             //Złączenie obu części w jedną tablicę
-            int[] combinedArray = new int[l.length + r.length];
-            System.arraycopy(r, 0, combinedArray, 0, r.length);
-            System.arraycopy(l, 0, combinedArray, l.length, r.length);
+            int[] combinedArray = new int[leftBlock.length + rightBlock.length];
+            System.arraycopy(rightBlock, 0, combinedArray, 0, rightBlock.length);
+            System.arraycopy(leftBlock, 0, combinedArray, leftBlock.length, rightBlock.length);
 
             //Złączony blok 64-bitowy poddajemy odwróconej tablicy permutacji i dopisujemy do wyniku
             int[] arrayAfterPermutation = permutation(combinedArray, ConstantTables.INVERTED_IP);
@@ -67,7 +66,6 @@ public class Des {
             }
 
         }
-        System.out.println(result);
         return result.toString();
     }
 
