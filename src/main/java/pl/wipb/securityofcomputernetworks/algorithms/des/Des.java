@@ -58,7 +58,8 @@ public class Des {
 
         for (int i = 0; i < sumOfBlocks; i++) {
             //Podział bloku na część lewą i prawą
-
+            int[] l = divideArrayToLeftBlock(dividedBlocksInBinary.get(i));
+            int[] r = divideArrayToRightBlock(dividedBlocksInBinary.get(i));
 
             //Wykonanie 16 iteracji algorytmu
 
@@ -436,6 +437,16 @@ public class Des {
             result = (result << 1) | (key >> s & 1);
         }
         return result;
+    }
+
+    //Uzyskanie bloku lewego
+    public static int[] divideArrayToLeftBlock(int[] arrayAfterPermutation) {
+        return Arrays.copyOfRange(arrayAfterPermutation, 0, 32);
+    }
+
+    //Uzyskanie bloku prawego
+    public static int[] divideArrayToRightBlock(int[] arrayAfterPermutation) {
+        return Arrays.copyOfRange(arrayAfterPermutation, 32, 64);
     }
 
     // Funkcja Feistela
