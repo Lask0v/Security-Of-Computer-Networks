@@ -5,13 +5,15 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,16 +35,19 @@ public class Des {
         this.generator = generator;
     }
 
-    public static String encode(MultipartFile file, String key) throws IOException {
+    @RequestMapping(
+            path = "/upload",
+            method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public static String encode(@RequestPart(required = true) MultipartFile file, @RequestParam String key) throws IOException {
+        InputStream inputStream = new BufferedInputStream(file.getInputStream());
         byte[] buffer = new byte[8];
-        InputStream inputStream = file.getInputStream();
         while (inputStream.read(buffer) != -1) {
             //Krok pierwszy
             String correctedHexMessage = fillBlockIfMessageIsNotEqualDivided(encodeByteArrayToHex(buffer));
             processEncryption(correctedHexMessage, key);
-
-
         }
+
         return Strings.EMPTY;
     }
 
@@ -52,21 +57,32 @@ public class Des {
      *
      * @return Poprawioną wiadomość, z równo podzielonymi blokami gotową do kodowania
      */
-    private static String fillBlockIfMessageIsNotEqualDivided(String hexMessage) {
-        StringBuilder correctedMessage = new StringBuilder(hexMessage);
-        for (int i = 0; i < 16 - (hexMessage.length() % 16); i++) {
-            correctedMessage.append("0");
+    private static String fillBlockIfMessageIsNotEqualDivided(String text) {
+        // konwertowanie hasła do bitów
+        String textInBinary = new BigInteger(text.getBytes()).toString(2);
+        //gdy w pierwszym znaku na początku są 0 to są pomijane i trzeba je dopisać
+        while (textInBinary.length() % 8 != 0) {
+            textInBinary = "0" + textInBinary;
         }
-        return correctedMessage.toString();
+        return textInBinary;
     }
 
     public static String processEncryption(String hexMessage, String hexKey) {
-//        encrypt( BooleanUtils.toBoolean(Integer.parseInt(hexMessage, 16)),
-//        ;)
 
         boolean[] input = hexToBooleanArray(hexMessage);
         boolean[] keys = hexToBooleanArray(hexKey);
         return null;
+    }
+
+    //    KROK 2
+    private static boolean [] initialPermutationStepTwo(boolean[] inputData) {
+        boolean[] result = new boolean[inputData.length];
+        for (int i = 0; i < inputData.length; i++) {
+            for (int i1 : ConstantTables.IP) {
+                result[i] = inputData[i1];
+            }
+        }
+        return result;
     }
 
     //    KROK 4
