@@ -49,14 +49,11 @@ public class Des {
             dividedBlocksInBinary.set(i, permutation(dividedBlocksInBinary.get(i), ConstantTables.IP));
         }
 
-        System.out.println(Arrays.toString(dividedBlocksInBinary.get(0)));
 
         //Stworzenie tablicy kluczy składającej się z 16 elementów
         long keyToLong = new BigInteger(key,16).longValue();
         String[] keys = getKeys(keyToLong);
-        for (String s : keys) {
-            System.out.println(s);
-        }
+
         return Strings.EMPTY;
     }
 
