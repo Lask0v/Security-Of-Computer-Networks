@@ -67,8 +67,8 @@ public class Des {
             }
 
         }
-
-        return Strings.EMPTY;
+        System.out.println(result);
+        return result.toString();
     }
 
     public static String decode(String text, String key) {
@@ -146,7 +146,6 @@ public class Des {
         for (int i = 0; i < textInBinary.length(); i++) {
             bitsInIntegerArray[i] = Integer.parseInt(textInBinary.charAt(i) + "");
         }
-        System.out.println(Arrays.toString(bitsInIntegerArray));
 
         //Podział na bloki
         List<int[]> blocksInBinary = new LinkedList<>();
@@ -170,6 +169,11 @@ public class Des {
         //gdy w pierwszym znaku na początku są 0 to są pomijane i trzeba je dopisać
         while (textInBinary.length() % 8 != 0) {
             textInBinary = "0" + textInBinary;
+        }
+
+        // dodanie bitów aby były bloki 64 bitowe oraz zapisanie ile takich bitów było
+        while (textInBinary.length() % SIZE_OF_BLOCK != 0) {
+            textInBinary += "0";
         }
         return textInBinary;
     }
