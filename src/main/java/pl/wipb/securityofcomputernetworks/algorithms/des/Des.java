@@ -62,7 +62,15 @@ public class Des {
             int[] r = divideArrayToRightBlock(dividedBlocksInBinary.get(i));
 
             //Wykonanie 16 iteracji algorytmu
-
+            for (int j = 0; j < 16; j++) {
+                int[] nKey = new int[48];
+                for (int z = 0; z < keys.length; z++) {
+                    nKey[z] = Integer.parseInt(keys[j].charAt(z) + "");
+                }
+                int[] prev = l;
+                l = r;
+                r = XORArrays(prev, function(nKey, r));
+            }
 
             //Złączenie obu części w jedną tablicę
 
@@ -231,9 +239,6 @@ public class Des {
     private static boolean[] transform32BitInto48(boolean[] data) {
         boolean[] result = new boolean[48];
         int counter = 0;
-        for (int i : ConstantTables.E_FUNC) {
-            result[counter++] = data[i];
-        }
         return result;
     }
 
@@ -449,65 +454,82 @@ public class Des {
         return Arrays.copyOfRange(arrayAfterPermutation, 32, 64);
     }
 
-    // Funkcja Feistela
-    public static boolean[] feistelFunction(boolean[] rightBlock, boolean[] key) {
-        boolean[] extendedTable = new boolean[48];
-        for (int i = 0; i < 48; i++) {
+    public static int[] function(int[] key, int[] R) {
+        // zmienna r przechowuje bity które są kombinacją bitów R według kolejności z tablicy E
+        int[] r = new int[48];
+        int k = 0;
 
-            // Zastosowanie permutacji rozszerzającej
-            extendedTable[i] = rightBlock[ConstantTables.E_FUNC[i] - 1];
-        }
-        int result;
-        int[] afterXor = new int[48];
-        for (int i = 0; i < 48; i++) {
-            // Przeprowadzenie operacji XOR na tabeli po permitacji rozszerzonej z aktualnym kluczem
-            afterXor[i] = (extendedTable[i] ^ key[i]) ? 1 : 0;
-        }
-        int j = 0;
-        String binaryResult;
-
-        // Bloki wynikowe
-        boolean[] resultBlock = new boolean[32];
-        Block block = new Block();
-        // 8 bloków po 6 bitów
-        for (int i = 0; i < 8; i++) {
-            // Obliczanie rzędu
-            int outer = afterXor[i * 6] * 2 + afterXor[i * 6 + 5];
-            // Obliczanie kolumny
-            int inner = afterXor[i * 6 + 1] * 8 + afterXor[i * 6 + 2] * 4 + afterXor[i * 6 + 3] * 2 + afterXor[i * 6 + 4];
-
-            // Pobieranie wartości z odpowiedniej komórki tabeli
-            result = Block.block[i][outer][inner];
-            // Wynik z tabeli po przekształceniu binarnym
-            binaryResult = Integer.toBinaryString(result);
-            String tempBinaryResult = "";
-            // Zmiana na binarną
-            if (binaryResult.length() == 4) {
-                tempBinaryResult = binaryResult;
-            } else if (binaryResult.length() == 3) {
-                tempBinaryResult = "0" + binaryResult.charAt(0) + binaryResult.charAt(1) + binaryResult.charAt(2);
-            } else if (binaryResult.length() == 2) {
-                tempBinaryResult = "00" + binaryResult.charAt(0) + binaryResult.charAt(1);
-            } else if (binaryResult.length() == 1) {
-                tempBinaryResult = "000" + binaryResult.charAt(0);
-            } else if (binaryResult.length() == 0) {
-                tempBinaryResult = "0000";
+        // przyporządkowanie bitów zgodnie z kolejnością z tablicy E do tablicy r
+        for (int i = 0; i < ConstantTables.E_FUNC.length; i++) {
+            for (int j = 0; j < ConstantTables.E_FUNC[0].length; j++) {
+                r[k++] = R[ConstantTables.E_FUNC[i][j] - 1];
             }
-            // Zapis wyniku bloku do resultBlock
-            for (int l = 0; l < 4; l++)
-                if (tempBinaryResult.charAt(l) == '1') {
-                    resultBlock[j++] = true;
-                } else if (tempBinaryResult.charAt(l) == '0') {
-                    resultBlock[j++] = false;
-                }
+        }
+        // Wykonanie operacji xor pomiędzy bitami z tablicy r i tablicy key i przydzielenie ich do tymczasowej tablicy tmp
+        int[] tmp = XORArrays(key, r);
+
+        // dzielimy uzyskany ciąg bitów ( tmp ) na 8 ciągów 6 bitowych
+        // wydzielamy pierwszy i ostatni bit jako indeks wiersza
+        // środkowe bity oznaczają indeks kolumny
+        // wyczytaną wartość zmieniamy na kod binarny i to są nasze 4 bity które dodajemy do wyniku
+        k = 0;
+
+        // Zmienna l wykorzystywana jest do ustalenia którą tablicę S mamy wykorzystać
+        int l = 0;
+        Collections.addAll(ConstantTables.listOfS, ConstantTables.S1_FUNC,
+                ConstantTables.S2_FUNC, ConstantTables.S3_FUNC, ConstantTables.S4_FUNC, ConstantTables.S5_FUNC,
+                ConstantTables.S6_FUNC, ConstantTables.S7_FUNC, ConstantTables.S8_FUNC);
+
+        int[] beforeP = new int[32];
+        for (int i = 0; i < 48; i += 6) {
+            // tutaj wydzielamy bity które będą określać wiersz i kolumnę
+            String rowString = tmp[i] + "" + tmp[i + 5];
+            String columnString = tmp[i + 1] + "" + tmp[i + 2] + tmp[i + 3] + tmp[i + 4];
+            int row = Integer.parseInt(rowString, 2);
+            int column = Integer.parseInt(columnString, 2);
+
+            // pobieramy wartość z tablic S która będzie naszymi bitami w końcowej tablicy
+            int idx = ConstantTables.listOfS.get(l++)[row][column];
+
+            // konwertujemy integer na string binarny
+            String binaryIdx = Integer.toBinaryString(idx);
+
+            // jeśli najwyższy bit nie stoi na 8, to musimy dodać 0 na początku tak aby końcowo nasza wartość miała 4 bity
+            if (Integer.highestOneBit(idx) < 8) {
+                int highestOneBit = Integer.highestOneBit(idx) / 2;
+                for (int j = 3; j > highestOneBit; j--)
+                    binaryIdx = "0" + binaryIdx;
+            }
+
+            for (int j = 0; j < 4; j++) {
+                beforeP[k++] = Integer.parseInt(binaryIdx.substring(j, j + 1));
+            }
+        }
+        // Permutacja tablicy beforeP z P
+        int[] result = new int[32];
+
+        k = 0;
+        for (int i = 0; i < ConstantTables.P_FUNC.length; i++) {
+            for (int j = 0; j < ConstantTables.P_FUNC[0].length; j++) {
+                result[k++] = beforeP[ConstantTables.P_FUNC[i][j] - 1];
+            }
         }
 
-        boolean[] output = new boolean[32];
-        for (int i = 0; i < 32; i++) {
-            output[i] = resultBlock[ConstantTables.P_FUNC[i] - 1];
-        }
-        return output;
+        return result;
     }
+
+    public static int[] XORArrays(int[] arg1, int[] arg2) {
+        int[] tmp = new int[arg1.length];
+        for (int i = 0; i < tmp.length; i++) {
+            tmp[i] = XOR(arg1[i], arg2[i]);
+        }
+        return tmp;
+    }
+
+    public static int XOR(int arg1, int arg2) {
+        return arg1 ^ arg2;
+    }
+
 
     public static String encodeByteArrayToHex(byte[] bytes) {
         return Hex.encodeHexString(bytes);
