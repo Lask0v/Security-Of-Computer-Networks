@@ -54,6 +54,22 @@ public class Des {
         long keyToLong = new BigInteger(key,16).longValue();
         String[] keys = getKeys(keyToLong);
 
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < sumOfBlocks; i++) {
+            //Podział bloku na część lewą i prawą
+
+
+            //Wykonanie 16 iteracji algorytmu
+
+
+            //Złączenie obu części w jedną tablicę
+
+
+            //Złączony blok 64-bitowy poddajemy odwróconej tablicy permutacji i dopisujemy do wyniku
+
+        }
+
         return Strings.EMPTY;
     }
 
