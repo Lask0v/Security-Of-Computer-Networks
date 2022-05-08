@@ -5,14 +5,10 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import pl.wipb.securityofcomputernetworks.algorithms.generator.Generator;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.logging.Logger;
@@ -46,13 +42,13 @@ public class Des {
         String textInBinary = fillBlockIfMessageIsNotEqualDivided(str);
         int sumOfBlocks = textInBinary.length() / SIZE_OF_BLOCK;
 
-        convertTextToIntArrayAndDivideToBlocks(textInBinary, sumOfBlocks);
+        List<int[]> dividedBlocksInBinary = convertTextToIntArrayAndDivideToBlocks(textInBinary, sumOfBlocks);
 
 
         return Strings.EMPTY;
     }
 
-    private static void convertTextToIntArrayAndDivideToBlocks(String textInBinary, int sumOfBlocks) {
+    private static List<int[]> convertTextToIntArrayAndDivideToBlocks(String textInBinary, int sumOfBlocks) {
         //Konwersja na tablicę
         int[] bitsInIntegerArray = new int[textInBinary.length()];
         for (int i = 0; i < textInBinary.length(); i++) {
@@ -66,7 +62,7 @@ public class Des {
             int[] singleBlock = Arrays.copyOfRange(bitsInIntegerArray, i * SIZE_OF_BLOCK, (i * SIZE_OF_BLOCK) + SIZE_OF_BLOCK);
             blocksInBinary.add(singleBlock);
         }
-        System.out.println(Arrays.toString(blocksInBinary.get(0)));
+        return blocksInBinary;
     }
 
 
