@@ -44,6 +44,10 @@ public class Des {
 
         List<int[]> dividedBlocksInBinary = convertTextToIntArrayAndDivideToBlocks(textInBinary, sumOfBlocks);
 
+        //permutacje inicjalizujące
+        for (int i = 0; i < sumOfBlocks; i++) {
+            dividedBlocksInBinary.set(i, permutation(dividedBlocksInBinary.get(i), ConstantTables.IP));
+        }
 
         return Strings.EMPTY;
     }
@@ -392,6 +396,19 @@ public class Des {
             }
         }
         return newTable;
+    }
+
+    public static int[] permutation(int[] singleBlock, int[][] permArray) {
+        int[] arrayAfterPermutation = new int[64];
+        int k = 0;
+        // przypisanie bitów zgodnie z permutacją permArray
+        for (int i = 0; i < permArray.length; i++) {
+            for (int j = 0; j < permArray[0].length; j++) {
+                arrayAfterPermutation[k++] = singleBlock[permArray[i][j] - 1];
+            }
+        }
+
+        return arrayAfterPermutation;
     }
 
     // Funkcja Feistela
