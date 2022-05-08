@@ -49,6 +49,14 @@ public class Des {
             dividedBlocksInBinary.set(i, permutation(dividedBlocksInBinary.get(i), ConstantTables.IP));
         }
 
+        System.out.println(Arrays.toString(dividedBlocksInBinary.get(0)));
+
+        //Stworzenie tablicy kluczy składającej się z 16 elementów
+        long keyToLong = new BigInteger(key,16).longValue();
+        String[] keys = getKeys(keyToLong);
+        for (String s : keys) {
+            System.out.println(s);
+        }
         return Strings.EMPTY;
     }
 
@@ -97,7 +105,7 @@ public class Des {
     //    KROK 4
     private static boolean[] reduceKey(boolean[] key) {
         boolean[] reducedKey = new boolean[56];
-        int[] flattedArray = flatArrayTwoDimensionalIntoOneDimensionalArray(ConstantTables.PC_1);
+        int[] flattedArray = null;
         for (int i = 0; i < reducedKey.length; i++) {
             for (int i1 : flattedArray) {
                 reducedKey[i] = key[i1];
@@ -158,7 +166,7 @@ public class Des {
 
     //    KROK 7
     private static boolean[] permutedChoiceSecond(boolean[] key) {
-        int[] ints = flatArrayTwoDimensionalIntoOneDimensionalArray(ConstantTables.PC_2);
+        int[] ints = null;
         for (int i = 0; i < ints.length; i++) {
             key[i] = key[ints[i]];
         }
@@ -243,7 +251,7 @@ public class Des {
 
         // Zastosowanie na kluczu permutowanego wyboru
         // W newKeysArray jest teraz 56 elementów
-        boolean[] newKeysArray = permutedChoice(keysArray);
+        boolean[] newKeysArray = null;
 
         // KROK 5
         // Dzielenie klucza na pół
@@ -361,18 +369,7 @@ public class Des {
         return output;
     }
 
-    // Permutacja PC
-    public static boolean[] permutedChoice(boolean[] input) {
-        boolean[] newTable = new boolean[56];
-        int counter = 0;
-        for (int i = 0; i < ConstantTables.PC_1.length; i++) {
-            for (int j = 0; j < ConstantTables.PC_1[i].length; j++) {
-                newTable[counter] = input[ConstantTables.PC_1[i][j]];
-                counter++;
-            }
-        }
-        return newTable;
-    }
+
 
     public static int[] permutation(int[] singleBlock, int[][] permArray) {
         int[] arrayAfterPermutation = new int[64];
@@ -385,6 +382,47 @@ public class Des {
         }
 
         return arrayAfterPermutation;
+    }
+
+    private static String[] getKeys(long key) {
+        String subKeys[] = new String[16];
+
+        //permutacja klucza według PC1, redukcja z 64 bitów na 56
+        key = permuteKey(ConstantTables.PC_1, 64, key);
+
+        //podział klucza na dwie 28-bitowe części
+        int c = (int) (key >> 28);
+        int d = (int) (key & 0xFFFFFFF);
+
+        for (int i = 0; i < 16; i++) {
+
+            //przesunięcia w lewo o x bitów zgodnie z tablicą SHIFT
+            c = ((c << ConstantTables.LEFT_SHIFTS_ITERATIONS[i]) & 0xFFFFFFF) | (c >> (28 - ConstantTables.LEFT_SHIFTS_ITERATIONS[i]));
+            d = ((d << ConstantTables.LEFT_SHIFTS_ITERATIONS[i]) & 0xFFFFFFF) | (d >> (28 - ConstantTables.LEFT_SHIFTS_ITERATIONS[i]));
+
+            //połączenie obu bloków c i d
+            long cd = (c & 0xFFFFFFFFL) << 28 | (d & 0xFFFFFFFFL);
+
+            //permutacja klucza według PC2, redukcja z 56 bitów na 48
+            long subKey = permuteKey(ConstantTables.PC_2, 56, cd);
+
+            //zamiana klucza na binarnego stringa
+            subKeys[i] = Long.toBinaryString(subKey);
+            while (subKeys[i].length() % 48 != 0) {
+                subKeys[i] = "0" + subKeys[i];
+            }
+        }
+
+        return subKeys;
+    }
+
+    private static long permuteKey(int[] pc, int noBits, long key) {
+        long result = 0;
+        for (int i = 0; i < pc.length; i++) {
+            int s = noBits - pc[i];
+            result = (result << 1) | (key >> s & 1);
+        }
+        return result;
     }
 
     // Funkcja Feistela
