@@ -11,8 +11,18 @@ import java.util.*;
 public class Des {
     private static final int SIZE_OF_BLOCK = 64;
 
-    public static String encode(String str, String key) {
-        String textInBinary = fillBlockIfMessageIsNotEqualDivided(str);
+    @GetMapping("/encrypt")
+    public String encrypt(@RequestParam String message, @RequestParam String key) {
+        return encode(message, key);
+    }
+
+    @GetMapping("/decrypt")
+    public String decrypt(@RequestParam String message, @RequestParam String key) {
+        return decode(message, key);
+    }
+
+    public static String encode(String text, String key) {
+        String textInBinary = fillBlockIfMessageIsNotEqualDivided(text);
         int sumOfBlocks = textInBinary.length() / SIZE_OF_BLOCK;
 
         List<int[]> dividedBlocksInBinary = convertTextToIntArrayAndDivideToBlocks(textInBinary, sumOfBlocks);
@@ -55,9 +65,6 @@ public class Des {
             for (int k = 0; k < arrayAfterPermutation.length; k++) {
                 result.append(arrayAfterPermutation[k]);
             }
-
-
-            //Złączony blok 64-bitowy poddajemy odwróconej tablicy permutacji i dopisujemy do wyniku
 
         }
 
