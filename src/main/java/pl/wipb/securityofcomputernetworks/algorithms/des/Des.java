@@ -11,12 +11,12 @@ public class Des {
     private static final int SIZE_OF_BLOCK = 64;
 
     @GetMapping("/encrypt")
-    public String encrypt(@RequestParam String message, @RequestParam String key) {
+    public static String encrypt(@RequestParam String message, @RequestParam String key) {
         return encode(message, key);
     }
 
     @GetMapping("/decrypt")
-    public String decrypt(@RequestParam String message, @RequestParam String key) {
+    public static String decrypt(@RequestParam String message, @RequestParam String key) {
         return decode(message, key);
     }
 
