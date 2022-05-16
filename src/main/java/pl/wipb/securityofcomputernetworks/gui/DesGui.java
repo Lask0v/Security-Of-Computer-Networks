@@ -110,7 +110,7 @@ public class DesGui extends JFrame implements ActionListener {
 
     // if the button is pressed
     public void actionPerformed(ActionEvent e) {
-        if (validateInputData(inputWord) && validateInputData(inputKey))
+        if (validateInputData(inputWord) && validateInputData(inputKey) && validateInputKey(inputKey))
             if (e.getActionCommand().equals("ENCRYPT")) {
                 inputWord.setText(Des.encrypt(inputWord.getText(), inputKey.getText()));
                 buttonEncrypt.setEnabled(false);
@@ -127,6 +127,16 @@ public class DesGui extends JFrame implements ActionListener {
         if (inputWord.getText().length() == 0) {
             JOptionPane.showMessageDialog(frame, "Fill the form");
             return false;
+        }
+        return true;
+    }
+
+    private boolean validateInputKey(JTextField inputKey){
+        for (char character : HEX_CHARACTERS) {
+            if(inputKey.getText().contains(String.valueOf(character))){
+                JOptionPane.showMessageDialog(frame, "Key has to be in HEX");
+                return false;
+            }
         }
         return true;
     }
