@@ -30,6 +30,7 @@ public class DesGui extends JFrame implements ActionListener {
 
     static boolean isEncryptedAlready = false;
     static boolean isDecryptedAlready = false;
+
     // default constructor
     public DesGui() {
     }
@@ -109,14 +110,23 @@ public class DesGui extends JFrame implements ActionListener {
 
     // if the button is pressed
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("ENCRYPT") && !isEncryptedAlready) {
-            inputWord.setText(Des.encrypt(inputWord.getText(), inputKey.getText()));
-            isEncryptedAlready = true;
-            isDecryptedAlready = false;
-        } else if (e.getActionCommand().equals("DECRYPT") && !isDecryptedAlready) {
-            inputWord.setText(Des.decrypt(inputWord.getText(), inputKey.getText()));
-            isDecryptedAlready = true;
-            isEncryptedAlready = false;
+        if (validateInputData(inputWord) && validateInputData(inputKey))
+            if (e.getActionCommand().equals("ENCRYPT") && !isEncryptedAlready) {
+                inputWord.setText(Des.encrypt(inputWord.getText(), inputKey.getText()));
+                isEncryptedAlready = true;
+                isDecryptedAlready = false;
+            } else if (e.getActionCommand().equals("DECRYPT") && !isDecryptedAlready) {
+                inputWord.setText(Des.decrypt(inputWord.getText(), inputKey.getText()));
+                isDecryptedAlready = true;
+                isEncryptedAlready = false;
+            }
+    }
+
+    private boolean validateInputData(JTextField inputWord) {
+        if (inputWord.getText().length() == 0) {
+            JOptionPane.showMessageDialog(frame, "Fill the form");
+            return false;
         }
+        return true;
     }
 }
