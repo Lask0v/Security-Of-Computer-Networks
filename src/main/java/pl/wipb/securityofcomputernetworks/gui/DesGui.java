@@ -41,7 +41,6 @@ public class DesGui extends JFrame implements ActionListener {
         frame = new JFrame("DES");
 
         // create a label to display text
-//        output = new JLabel("nothing enered");
         inputMessageLabel = new JLabel("INPUT MESSAGE HERE");
         inputKeyLabel = new JLabel("INPUT KEY HERE");
 
@@ -56,10 +55,10 @@ public class DesGui extends JFrame implements ActionListener {
         buttonEncrypt.addActionListener(te);
         buttonDecrypt.addActionListener(te);
 
-        // create a object of JTextField with 16 columns
-        inputWord = new JTextField(16);
-        outputWord = new JTextField(16);
-        inputKey = new JTextField(16);
+        // create a object of JTextField with 25 columns
+        inputWord = new JTextField(60);
+        outputWord = new JTextField(25);
+        inputKey = new JTextField(60);
 
         // create an object of font type
         Font fo = new Font("Serif", Font.BOLD, 15);
@@ -87,6 +86,11 @@ public class DesGui extends JFrame implements ActionListener {
         JPanel inputPanel = new JPanel();
         JPanel inputMessagePanel = new JPanel();
         JPanel inputKeyPanel = new JPanel();
+
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+        inputMessagePanel.setLayout(new BoxLayout(inputMessagePanel, BoxLayout.Y_AXIS));
+        inputKeyPanel.setLayout(new BoxLayout(inputKeyPanel, BoxLayout.Y_AXIS));
+
         inputMessagePanel.add(inputMessageLabel);
         inputMessagePanel.add(inputWord);
         inputKeyPanel.add(inputKeyLabel);
@@ -95,6 +99,7 @@ public class DesGui extends JFrame implements ActionListener {
         inputPanel.add(inputKeyPanel);
         inputPanel.setLayout(new FlowLayout());
 
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.add(inputPanel);
         p.add(buttonPanel);
 
@@ -102,8 +107,9 @@ public class DesGui extends JFrame implements ActionListener {
         frame.add(p);
 
         // set the size of frame
-        frame.setSize(400, 400);
-        frame.pack();
+        frame.setSize(800, 400);
+        frame.setResizable(false);
+//        frame.pack();
 
         frame.show();
     }
