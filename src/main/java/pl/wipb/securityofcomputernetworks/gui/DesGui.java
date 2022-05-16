@@ -130,4 +130,6 @@ public class DesGui extends JFrame implements ActionListener {
         }
         return true;
     }
+
+    private static char[] HEX_CHARACTERS = new char[] {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 }
