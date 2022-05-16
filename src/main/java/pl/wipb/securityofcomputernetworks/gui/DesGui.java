@@ -111,14 +111,15 @@ public class DesGui extends JFrame implements ActionListener {
     // if the button is pressed
     public void actionPerformed(ActionEvent e) {
         if (validateInputData(inputWord) && validateInputData(inputKey))
-            if (e.getActionCommand().equals("ENCRYPT") && !isEncryptedAlready) {
+            if (e.getActionCommand().equals("ENCRYPT")) {
                 inputWord.setText(Des.encrypt(inputWord.getText(), inputKey.getText()));
-                isEncryptedAlready = true;
-                isDecryptedAlready = false;
-            } else if (e.getActionCommand().equals("DECRYPT") && !isDecryptedAlready) {
+                buttonEncrypt.setEnabled(false);
+                buttonDecrypt.setEnabled(true);
+
+            } else if (e.getActionCommand().equals("DECRYPT")) {
                 inputWord.setText(Des.decrypt(inputWord.getText(), inputKey.getText()));
-                isDecryptedAlready = true;
-                isEncryptedAlready = false;
+                buttonEncrypt.setEnabled(true);
+                buttonDecrypt.setEnabled(false);
             }
     }
 
