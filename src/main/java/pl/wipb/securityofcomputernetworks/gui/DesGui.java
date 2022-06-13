@@ -4,10 +4,14 @@ package pl.wipb.securityofcomputernetworks.gui;
 
 import pl.wipb.securityofcomputernetworks.algorithms.des.Des;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class DesGui extends JFrame implements ActionListener {
     // JTextField
@@ -36,9 +40,12 @@ public class DesGui extends JFrame implements ActionListener {
     }
 
     // main class
-    public void main() {
+    public void main() throws IOException {
         // create a new frame to store text field and button
         frame = new JFrame("DES");
+
+        // create a label to display welcome
+
 
         // create a label to display text
         inputMessageLabel = new JLabel("INPUT MESSAGE HERE");
@@ -56,9 +63,9 @@ public class DesGui extends JFrame implements ActionListener {
         buttonDecrypt.addActionListener(te);
 
         // create a object of JTextField with 25 columns
-        inputWord = new JTextField(60);
-        outputWord = new JTextField(25);
-        inputKey = new JTextField(60);
+        inputWord = new JTextField(100);
+        outputWord = new JTextField(73);
+        inputKey = new JTextField(100);
 
         // create an object of font type
         Font fo = new Font("Serif", Font.BOLD, 15);
@@ -107,7 +114,7 @@ public class DesGui extends JFrame implements ActionListener {
         frame.add(p);
 
         // set the size of frame
-        frame.setSize(800, 400);
+        frame.setSize(1300, 500);
         frame.setResizable(false);
 //        frame.pack();
 
@@ -138,8 +145,14 @@ public class DesGui extends JFrame implements ActionListener {
     }
 
     private boolean validateInputKey(JTextField inputKey){
-        for (char character : HEX_CHARACTERS) {
-            if(inputKey.getText().contains(String.valueOf(character))){
+        for(char character : inputKey.getText().toCharArray()){
+            boolean validate = false;
+            for (char hexChar : HEX_CHARACTERS){
+                if(character == hexChar){
+                    validate = true;
+                }
+            }
+            if(!validate){
                 JOptionPane.showMessageDialog(frame, "Key has to be in HEX");
                 return false;
             }
